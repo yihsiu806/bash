@@ -1,0 +1,250 @@
+#!/bin/bash
+
+# if not "@*", act like normal cd but keep the history
+if [ "${1:0:1}" != "@" ]; then
+	if [ "$1" == "" ]; then
+		pushd ~  > /dev/null
+	else
+		pushd $1 > /dev/null
+	fi
+	if [ $? -eq 0 ]; then
+		# try to remove identical history
+		if [ "`dirs +0`" == "`dirs +1`" ]; then
+			popd -n +1 > /dev/null
+		fi
+	fi
+    ls
+	return 0
+fi
+
+# if "@@", back to history
+if [ "$1" == "@@" ]; then
+	#pushd +1 > /dev/null # for ring-mode
+	popd > /dev/null # for stack-mode
+	if [ $? == 0 ]; then
+		pwd
+	else
+        popd -n +1 > /dev/null # remove bad entry
+    fi
+    return 0
+fi
+
+_arg=${1:1}
+
+# if it is "@=*", set bookmark
+if [ "${_arg:0:1}" == "=" ]; then
+	export CDECD_BM${_arg:1}=`pwd`
+	unset _arg
+	return 0
+fi
+
+# if it is "@0*" ~ "@9*", goto bookmark
+if [ "$_arg" \> "/" -a "$_arg" \< ":" ]; then
+	eval "'cd' \$CDECD_BM$_arg"
+	pwd
+	unset _arg
+	return 0
+fi
+
+# user-defined shortcuts
+if [ -f ~/bin/cdecd-shortcut ]; then
+	_tab=`cat ~/bin/cdecd-shortcut`
+	for _iii in $_tab
+	do
+		if [ "$_arg" == "${_iii%%:*}" ]; then
+			eval "'cd' ${_iii##*:}"
+			unset _iii _tab _arg
+			return 0
+		fi
+	done
+	unset _iii _tab
+fi
+
+# try to find project root
+_prj=
+_dir=`pwd`
+while [ "$_dir" != "" ]; do
+	if [ -f $_dir/modules.mk -a -f $_dir/Makefile -a -d $_dir/libmci ]; then
+		_prj=$_dir
+		break
+	fi
+	_dir=`echo $_dir | sed 's:^\(.*\)\(/.*\)$:\1:g'`
+done
+unset _dir
+
+default=~/supervyse/spv_core
+_prj=${_prj:-$default}
+
+# if not Corner DE layout, show error
+if [ "$_prj" == "" ]; then
+	if [ "$PRJROOT" == "" ]; then
+		echo "cdecd: Corner DE layout not found"
+		unset _prj
+		return -1
+	else
+		_prj=$PRJROOT
+	fi
+fi
+export PRJROOT=$_prj
+
+# sub-functions
+
+cdpeer ()
+{
+	local _dst=...
+	local _iii
+
+	if [ -f .tag.svnco-* ]; then
+		_dst=`cat .tag.svnco-*`
+	else
+		local _pwd=`pwd`
+		local _xxx=`echo $_pwd | sed "s:^$_prj/::g"`
+		case "${_xxx%%/*}" in
+		"linux"		) _dst=$_prj/linux/src;;
+		"busybox"	) _dst=$_prj/busybox/src;;
+		*			)
+
+			# mapping table
+			local _tab
+			_tab="$_tab rootfs:src rootfs/src:.."
+			_tab="$_tab tools/src:../compo tools/compo:../src"
+			_tab="$_tab rootfs/src/amit_priv:$_prj/rootfs/amit_priv"
+			_tab="$_tab rootfs/src/amit_open:$_prj/rootfs/amit_open"
+			_tab="$_tab rootfs/src/open_src:$_prj/rootfs/open_src"
+			_tab="$_tab rootfs/amit_priv:$_prj/rootfs/src/amit_priv"
+			_tab="$_tab rootfs/amit_open:$_prj/rootfs/src/amit_open"
+			_tab="$_tab rootfs/open_src:$_prj/rootfs/src/open_src"
+
+			# lookup in mapping table
+			for _iii in $_tab
+			do
+				if [ "$_xxx" == "${_iii%%:*}" ]; then
+					_dst=${_iii##*:}
+					break	
+				fi
+			done
+
+			# not in mapping table, try Makefile
+			if [ "$_dst" == "..." ]; then
+				if [ -f Makefile ]; then
+					_dst=../../src`sed -n '/COMPO_DIR :=/p' Makefile | sed 's:^.*)::g'`
+				fi
+			fi;;
+		esac
+	fi
+
+	if [ -d $_dst ]; then
+		_cd2=$_dst
+	else
+		echo "cdecd: no peer!"
+	fi
+}
+
+version=3.5
+if [ -d $_prj/busybox ]
+then
+    version=3
+fi
+# try to match shortcut
+_cd2=
+
+if [ "$version" == "3" ]
+then
+case "$_arg" in
+	""		) cdpeer;;
+	"/"		) _cd2=$_prj;;
+    "ikvm"  ) _cd2=$_prj/ikvm_dev;;
+    "W"     ) _cd2=$_prj/Web_Server;;
+    "light" ) _cd2=$_prj/Web_Server/httpd;;
+    "r"     ) _cd2=$_prj/Web_Server/OS/Linux/redfish;;
+    "w"     ) _cd2=$_prj/Web_Server/OS/Linux;;
+    "ws"    ) _cd2=$_prj/Web_Server/OS/Linux/Web_Style;;
+    "wsi"   ) _cd2=$_prj/Web_Server/OS/Linux/Web_Style/INSYDE;;
+    "wp"    ) _cd2=$_prj/Web_Server/OS/Linux/Web_Style/INSYDE/page;;
+    "wh"    ) _cd2=$_prj/Web_Server/OS/Linux/Web_Style/INSYDE/help;;
+    "wj"    ) _cd2=$_prj/Web_Server/OS/Linux/Web_Style/INSYDE/js;;
+    "wc"    ) _cd2=$_prj/Web_Server/OS/Linux/Web_Style/INSYDE/css;;
+    "wi"    ) _cd2=$_prj/Web_Server/OS/Linux/Web_Style/INSYDE/images;;
+    "wl"    ) _cd2=$_prj/Web_Server/OS/Linux/Web_Style/INSYDE/js/lang;;
+    "i"     ) _cd2=$_prj/ipmid;;
+    "ii"    ) _cd2=$_prj/ipmid/IPMI/OEMCommand/Insyde;;
+    "id"    ) _cd2=$_prj/ipmid/Core/Drivers;;
+    "icp"   ) _cd2=$_prj/ipmid/Core/Platform;;
+    "ic"    ) _cd2=$_prj/ipmid/config/ast2500evb;;
+    "ipia"  ) _cd2=$_prj/ipmid/Core/Services/PIA;;
+    "ici"   ) _cd2=$_prj/ipmid/Core/Include;;
+    "t"     ) _cd2=$_prj/ToolChain/Host/AST2500/x-tools/arm-aspeed-linux-gnueabi/bin;;
+    "l"     ) _cd2=$_prj/Kernel/Host/AST2500/linux;;
+    "br"    ) _cd2=$_prj/BootLoader/rubix;;
+    "f"     ) _cd2=$_prj/FileSystem/Host/AST2500;;
+    "fr"    ) _cd2=$_prj/FileSystem/Host/AST2500/build.rootfs;;
+    "fw"    ) _cd2=$_prj/FileSystem/Host/AST2500/build.webfs;;
+    "fwj"   ) _cd2=$_prj/FileSystem/Host/AST2500/build.webfs/js;;
+    "sdr"   ) _cd2=$_prj/platform/Supervyse3.0/Platform/ast2500evb;;
+    "m"     ) _cd2=$_prj/libmci;;
+	*		) echo "cdecd: unknown shortcut"
+esac
+else
+case "$_arg" in
+	""		   ) cdpeer;;
+    "r1"        ) _cd2=/home/jenny/supervyse/AST25x0_PM-RV19.05_Purley;;
+    "r2"        ) _cd2=/home/jenny/supervyse/AST25x0_PM-RV19.05_Rome;;
+    "r3"        ) _cd2=/home/jenny/supervyse/AST25x0_SPF-RV19.05_Purley;;
+    "r4"        ) _cd2=/home/jenny/supervyse/AST25x0_SPF-RV19.05_Rome;;
+	"/"		   ) _cd2=$_prj;;
+	"pkconfig" ) _cd2=$_prj/PKConfig/Lx_Config;;
+	"cjson"    ) _cd2=$_prj/external/cjson/cJSON;;
+	"rcm"      ) _cd2=$_prj/RCM;;
+    "i"        ) _cd2=$_prj/ipmid;;
+    "ii"       ) _cd2=$_prj/ipmid/IPMI/OEMCommand/Insyde;;
+    "m"        ) _cd2=$_prj/libmci;;
+    "h"        ) _cd2=$_prj/external/webserver/httpd;;
+    "r"        ) _cd2=$_prj/redfish;;
+    "o"        ) _cd2=$_prj/out;;
+    "fw"       ) _cd2=$_prj/out/FileSystem/Host/AST2500/build.webfs;;
+    "ow"       ) _cd2=$_prj/out/web;;
+    "ocgi"     ) _cd2=$_prj/out/web/cgi;;
+    "oui"      ) _cd2=$_prj/out/web/webui;;
+    "w"        ) _cd2=$_prj/web;;
+    "opt"      ) _cd2=$_prj/web/optional;;
+    "cgi"      ) _cd2=$_prj/web/cgi;;
+    "ui"       ) _cd2=$_prj/web/webui;;
+    "page"     ) _cd2=$_prj/web/webui/page;;
+    "css"      ) _cd2=$_prj/web/webui/css;;
+    "js"       ) _cd2=$_prj/web/webui/js;;
+    "help"     ) _cd2=$_prj/web/webui/help;;
+    "image"    ) _cd2=$_prj/web/webui/images;;
+    "json"     ) _cd2=$_prj/web/webui/json;;
+    "ws"       ) _cd2=$_prj/Web_Server/OS/Linux/Web_Style/INSYDE;;
+    "ww"       ) _cd2=$_prj/Web_Server/OS/Linux/Web_Style/INSYDE/web-customized;;
+    "wp"       ) _cd2=$_prj/Web_Server/OS/Linux/Web_Style/INSYDE/page;;
+    "wc"       ) _cd2=$_prj/Web_Server/OS/Linux/Web_Style/INSYDE/css;;
+    "wj"       ) _cd2=$_prj/Web_Server/OS/Linux/Web_Style/INSYDE/js;;
+    "wh"       ) _cd2=$_prj/Web_Server/OS/Linux/Web_Style/INSYDE/help;;
+    "wi"       ) _cd2=$_prj/Web_Server/OS/Linux/Web_Style/INSYDE/images;;
+    "t"        ) _cd2=$_prj/toolchain/Host/AST2500/x-tools/arm-aspeed-linux-gnueabi/bin;;
+	*		   ) echo "cdecd: unknown shortcut"
+esac
+fi
+
+# change to matched dir
+if [ "$_cd2" != "" ]; then
+	pushd $_cd2 > /dev/null
+	if [ $? -eq 0 ]; then
+		pwd
+        ls
+		# try to remove identical history
+		if [ "`dirs +0`" == "`dirs +1`" ]; then
+			popd -n +1 > /dev/null
+		fi
+        if [ "$_arg" == "/" ] && [ -f "envsetup.sh" ]
+        then
+            source envsetup.sh ast2500evb
+        fi
+	fi
+fi
+
+unset _arg
+unset _prj
+unset _cd2
+unset cdpeer
