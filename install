@@ -1,6 +1,23 @@
 #!/bin/bash
 
-FILES="bashrc cdecd screenrc tmux.conf"
+sudo apt install -y git vim ctags tmux 
+
+ret=$(echo "$?")
+
+[ "$ret" = "0" ] || exit 1
+
+alias.co=checkout
+alias.br=branch
+alias.ci=commit
+alias.st=status
+alias.sl='stash list'
+git config --global alias.unstage 'reset HEAD --'
+git config --global alias.last 'log -1 HEAD'
+
+git clone http://github.com/yihsiu806/bash.git $HOME/.bash
+git clone http://github.com/yihsiu806/vim.git $HOME/.vim
+
+FILES="bashrc cdecd screenrc tmux.conf vimrc"
 TIMESTAMP=$(date +%s)
 
 for f in $FILES
@@ -27,8 +44,14 @@ SCRIPT=$(readlink -f "$0")
 SCRIPTPATH=$(dirname "$SCRIPT")
 for f in $FILES
 do
-    fpath=$SCRIPTPATH/$f
+    if [ $f = "vimrc" ]
+    then
+        continue
+    fi
+    fpath=$HOME/.bash/$f
     linkname=$HOME/.$f
     echo "Create symlink $linkname"
     ln -s $fpath $linkname
 done
+
+ln -s $HOME/.vim/vimrc $HOME/.vimrc
