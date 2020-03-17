@@ -1,6 +1,6 @@
 gitbranch() {
 #    br=$(git br 2> /dev/null | grep '\*' | cut -d' ' -f2)
-    br=$(git br 2> /dev/null | grep '\*')
+    br=$(git branch 2> /dev/null | grep '\*')
     [ -n "${br}" ] && echo " (${br#* })"
 }
 
@@ -13,15 +13,7 @@ alias lh='ls -lh'
 alias grep='grep --color'
 alias ip='ip -c'
 alias vi='vim'
-unset GREP_OPTIONS
 
-alias makeevb='make TARGET_ID=ast2500evb BUILD_JOBS=-j4'
-alias makewolfpass='make TARGET_ID=WolfPass BUILD_JOBS=-j4'
-alias makeyubacity='make TARGET_ID=YubaCity BUILD_JOBS=-j4'
-alias makespv='source envsetup.sh ast2500evb; make'
-
-alias cd='. $HOME/.cdecd'
-cs() { cd "$@" && ls; }
 
 # For colourful man pages (CLUG-Wiki style)
 export LESS_TERMCAP_mb=$'\E[01;31m'
@@ -35,9 +27,29 @@ export LESS_TERMCAP_us=$'\E[01;32m'
 export PAGER="less"
 
 export PATH=$PATH:~/bin
+cs() { cd "$@" && ls; }
+
+source /usr/share/bash-completion/completions/git
+
+alias cd='. $HOME/.cdecd'
 
 agr() { ag -0 -l "$1" "$JSONDIR" | xargs -r0 sed -i "/$1/d"; ag "$1"; }
-
 export JSONDIR="/home/jenny/supervyse/spv_core/web/webui/json"
-
 export -f agr
+
+chtn() { echo -ne "\033]0;$1\007"; }
+export -f chtn 
+
+alias spvbuild='time make BUILD_JOBS=-j4 2>&1 | tee ../build.log'
+
+alias restart-sep='sudo systemctl restart symcfgd rtvscand smcd autoprotect'
+
+# for superyse issue number
+export ISSUE_NUMBER_LOCATION=~/.issue
+
+alias makeevb='make TARGET_ID=ast2500evb BUILD_JOBS=-j4'
+alias makewolfpass='make TARGET_ID=WolfPass BUILD_JOBS=-j4'
+alias makeyubacity='make TARGET_ID=YubaCity BUILD_JOBS=-j4'
+alias makespv='source envsetup.sh ast2500evb; make'
+
+alias ipmitool='ipmitool -Ilanplus -H192.168.19.10 -Uroot -Proot'

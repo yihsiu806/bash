@@ -5,7 +5,7 @@ if [ "${1:0:1}" != "@" ]; then
 	if [ "$1" == "" ]; then
 		pushd ~  > /dev/null
 	else
-		pushd $1 > /dev/null
+		pushd "$1" > /dev/null
 	fi
 	if [ $? -eq 0 ]; then
 		# try to remove identical history
@@ -64,7 +64,7 @@ fi
 _prj=
 _dir=`pwd`
 while [ "$_dir" != "" ]; do
-	if [ -f $_dir/modules.mk -a -f $_dir/Makefile -a -d $_dir/libmci ]; then
+	if [ -f $_dir/Makefile -a -d $_dir/libmci ]; then
 		_prj=$_dir
 		break
 	fi
@@ -72,7 +72,7 @@ while [ "$_dir" != "" ]; do
 done
 unset _dir
 
-default=~/supervyse/spv_core
+default=~/supervyse/spv-core
 _prj=${_prj:-$default}
 
 # if not Corner DE layout, show error
@@ -200,7 +200,9 @@ case "$_arg" in
     "m"        ) _cd2=$_prj/libmci;;
     "h"        ) _cd2=$_prj/external/webserver/httpd;;
     "r"        ) _cd2=$_prj/redfish;;
+    "rcm"      ) _cd2=$_prj/RCM;;
     "o"        ) _cd2=$_prj/out;;
+    "e"        ) _cd2=$_prj/external;;
     "fw"       ) _cd2=$_prj/out/FileSystem/Host/AST2500/build.webfs;;
     "ow"       ) _cd2=$_prj/out/web;;
     "ocgi"     ) _cd2=$_prj/out/web/cgi;;
@@ -229,7 +231,7 @@ fi
 
 # change to matched dir
 if [ "$_cd2" != "" ]; then
-	pushd $_cd2 > /dev/null
+	pushd "$_cd2" > /dev/null
 	if [ $? -eq 0 ]; then
 		pwd
         ls
