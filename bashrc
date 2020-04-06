@@ -26,8 +26,8 @@ export LESS_TERMCAP_us=$'\E[01;32m'
 
 export PAGER="less"
 
-export PATH=$PATH:~/bin
 cs() { cd "$@" && ls; }
+export PATH=$PATH:$HOME/.local/bin:$HOME/bin
 
 source /usr/share/bash-completion/completions/git
 
@@ -38,7 +38,7 @@ export JSONDIR="/home/jenny/supervyse/spv-core/web/webui/json"
 export -f agr
 
 chtn() { echo -ne "\033]0;$1\007"; }
-export -f chtn 
+export -f chtn
 
 alias spvbuild="time make BUILD_JOBS=-j$(nproc --all) 2>&1 | tee ../build.log"
 alias make="make BUILD_JOBS=-j$(nproc --all)"
