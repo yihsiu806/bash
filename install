@@ -6,16 +6,26 @@ ret=$(echo "$?")
 
 [ "$ret" = "0" ] || exit 1
 
-alias.co=checkout
-alias.br=branch
-alias.ci=commit
-alias.st=status
-alias.sl='stash list'
+git config --global alias.co checkout
+git config --global alias.br branch
+git config --global alias.ci commit
+git config --global alias.st status
+git config --global alias.ss stash
+git config --global alias.sl 'stash list'
 git config --global alias.unstage 'reset HEAD --'
 git config --global alias.last 'log -1 HEAD'
 
-git clone http://github.com/yihsiu806/bash.git $HOME/.bash
-git clone http://github.com/yihsiu806/vim.git $HOME/.vim
+path_bash=$HOME/.bash
+path_vim=$HOME/.vim
+
+if [ ! -d $path_bash ]
+then
+    git clone http://github.com/yihsiu806/bash.git $HOME/.bash
+fi
+if [ ! -d $path_vim ]
+then
+    git clone http://github.com/yihsiu806/vim.git $HOME/.vim
+fi
 
 FILES="bashrc cdecd screenrc tmux.conf vimrc"
 TIMESTAMP=$(date +%s)
