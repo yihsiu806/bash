@@ -34,7 +34,7 @@ source /usr/share/bash-completion/completions/git
 alias cd='. $HOME/.cdecd'
 
 agr() { ag -0 -l "$1" "$JSONDIR" | xargs -r0 sed -i "/$1/d"; ag "$1"; }
-export JSONDIR="/home/jenny/supervyse/spv_core/web/webui/json"
+export JSONDIR="/home/jenny/supervyse/spv-core/web/webui/json"
 export -f agr
 
 chtn() { echo -ne "\033]0;$1\007"; }
@@ -42,7 +42,7 @@ export -f chtn
 
 alias spvbuild='time make BUILD_JOBS=-j4 2>&1 | tee ../build.log'
 
-alias restart-sep='sudo systemctl restart symcfgd rtvscand smcd autoprotect'
+alias sep-restart='sudo systemctl restart symcfgd rtvscand smcd autoprotect'
 
 # for superyse issue number
 export ISSUE_NUMBER_LOCATION=~/.issue
@@ -53,3 +53,4 @@ alias makeyubacity='make TARGET_ID=YubaCity BUILD_JOBS=-j4'
 alias makespv='source envsetup.sh ast2500evb; make'
 
 alias ipmitool='ipmitool -Ilanplus -H192.168.19.10 -Uroot -Proot'
+

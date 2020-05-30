@@ -141,7 +141,7 @@ cdpeer ()
 }
 
 version=3.5
-if [ -d $_prj/busybox ]
+if [ -d $_prj/Web_Server ]
 then
     version=3
 fi
@@ -153,13 +153,13 @@ then
 case "$_arg" in
 	""		) cdpeer;;
 	"/"		) _cd2=$_prj;;
+    "ui"   ) _cd2=$_prj/Web_Server/OS/Linux/Web_Style/INSYDE;;
     "ikvm"  ) _cd2=$_prj/ikvm_dev;;
     "W"     ) _cd2=$_prj/Web_Server;;
     "light" ) _cd2=$_prj/Web_Server/httpd;;
     "r"     ) _cd2=$_prj/Web_Server/OS/Linux/redfish;;
     "w"     ) _cd2=$_prj/Web_Server/OS/Linux;;
     "ws"    ) _cd2=$_prj/Web_Server/OS/Linux/Web_Style;;
-    "wsi"   ) _cd2=$_prj/Web_Server/OS/Linux/Web_Style/INSYDE;;
     "wp"    ) _cd2=$_prj/Web_Server/OS/Linux/Web_Style/INSYDE/page;;
     "wh"    ) _cd2=$_prj/Web_Server/OS/Linux/Web_Style/INSYDE/help;;
     "wj"    ) _cd2=$_prj/Web_Server/OS/Linux/Web_Style/INSYDE/js;;
