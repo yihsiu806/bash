@@ -40,7 +40,8 @@ export -f agr
 chtn() { echo -ne "\033]0;$1\007"; }
 export -f chtn 
 
-alias spvbuild='time make BUILD_JOBS=-j4 2>&1 | tee ../build.log'
+alias spvbuild="time make BUILD_JOBS=-j$(nproc --all) 2>&1 | tee ../build.log"
+alias make="make BUILD_JOBS=-j$(nproc --all)"
 
 alias sep-restart='sudo systemctl restart symcfgd rtvscand smcd autoprotect'
 
