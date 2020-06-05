@@ -203,10 +203,12 @@ case "$_arg" in
     "rcm"      ) _cd2=$_prj/RCM;;
     "o"        ) _cd2=$_prj/out;;
     "e"        ) _cd2=$_prj/external;;
+    "f"        ) _cd2=$_prj/FileSystem/Host/AST2500;;
     "fw"       ) _cd2=$_prj/out/FileSystem/Host/AST2500/build.webfs;;
     "ow"       ) _cd2=$_prj/out/web;;
     "ocgi"     ) _cd2=$_prj/out/web/cgi;;
     "oui"      ) _cd2=$_prj/out/web/webui;;
+    "p"        ) _cd2=$_prj/platform;;
     "w"        ) _cd2=$_prj/web;;
     "opt"      ) _cd2=$_prj/web/optional;;
     "cgi"      ) _cd2=$_prj/web/cgi;;
