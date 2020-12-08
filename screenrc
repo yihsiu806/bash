@@ -1,0 +1,13 @@
+vbell on
+autodetach on
+startup_message off
+defscrollback 10000
+
+caption always "%{=u .G} %-w%<%{=ub .y}%n %t%{=u .G}%+w "
+hardstatus alwaysignore
+hardstatus alwayslastline "%{= .K} [%l]%<%=%{= .W}@%H %=%{= .y} %Y/%m/%d%{= .m} %C %A"
+
+bind c screen 1
+bind ^c screen 1
+bind 0 select 10
+screen 1
