@@ -17,13 +17,13 @@ export LESS_TERMCAP_us=$'\E[01;32m'
 export PAGER="less"
 
 # PS1
-# gitbranch() {
-#     br=$(git branch 2> /dev/null | grep '\*')
-#     [ -n "${br}" ] && echo " (${br#* })"
-# }
+gitbranch() {
+    br=$(git branch 2> /dev/null | grep '\*')
+    [ -n "${br}" ] && echo " (${br#* })"
+}
 # PS1='\[\e[1;32m\][\w]\[\e[0m\] > '
 # PS1='\e[0;32m\w\e[m $'
-# PS1='\[\e[1;32m\][\w]\[\e[0m\]\[\e[1;33m\]$(gitbranch)\[\e[0m\]$( [ -n "${VIMRUNTIME}" ] && echo "\[\e[1;31m\] (vim)\[\e[0m\]" ) > '
+ PS1='\[\e[1;32m\][\w]\[\e[0m\]\[\e[1;33m\]$(gitbranch)\[\e[0m\]$( [ -n "${VIMRUNTIME}" ] && echo "\[\e[1;31m\] (vim)\[\e[0m\]" ) > '
 
 # powerline
 if [ -f /usr/share/powerline/bindings/bash/powerline.sh ]; then
